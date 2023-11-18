@@ -1,0 +1,36 @@
+#!/bin/sh -e
+# Check which package owns a file
+
+# Follow symlinks to any paths.
+case $1 in
+    /*)
+        cd -P "${SPKG_ROOT:-/}${1%/*}"
+        [ "$PWD" = / ] && SPKG_ROOT=
+    ;;
+
+    */*)
+        cd -P "${1%/*}"
+    ;;
+
+    *)
+        cd -P .
+    ;;
+esac
+
+[ -f "$PWD/${1##*/}" ] || {
+    printf 'usage: spkg-owns [/path/to/file]\n' >&2
+    exit 1
+}
+
+# Print the full path to the manifest file which contains
+# the match to our search.
+pkg_owns=$(grep -lFx \
+    "${PWD#"$SPKG_ROOT"}/${1##*/}" \
+    "$SPKG_ROOT/var/db/spkg/installed/"*/manifest)
+
+
+# Extract the package name from the path above.
+pkg_owns=${pkg_owns%/*}
+pkg_owns=${pkg_owns##*/}
+
+printf '%s\n' "$pkg_owns"

@@ -1,0 +1,9 @@
+#!/bin/sh -e
+# Display packages which depend on package
+
+[ "$1" ] || set -- "${PWD##*/}"
+
+cd "$SPKG_ROOT/var/db/spkg/installed"
+
+grep -E "^$1( |$)"  -- */depends
+

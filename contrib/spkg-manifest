@@ -1,0 +1,11 @@
+#!/bin/sh -ef
+# Display all files owned by a package
+
+pkg=${1:-"${PWD##*/}"}
+
+spkg list "$pkg" >/dev/null || {
+    printf 'usage: spkg-manifest [pkg]\n' >&2
+    exit 1
+}
+
+cat "$SPKG_ROOT/var/db/spkg/installed/$pkg/manifest" 2>/dev/null
